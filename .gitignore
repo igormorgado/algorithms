@@ -1,0 +1,16 @@
+*.o
+*~
+bt
+qllt
+*pyc
+
+build/
+BUILD/
+*.swp
+*.tmp
+*~.*
+*.o
+.#*
+
+__pycache__/
+
