@@ -1,11 +1,20 @@
 #ifndef NODE_H_
 #define NODE_H_
 
+
 /* Node sequential */
 struct Node {
-  int val;
+  int          val;
+  int          Altura;
+  int          Nivel;
+  int          SomaChaveD;
+  int          SomaChaveD2;
+  int          SomaChaveA;
+  int          SomaChaveA2;
+  float        PNivel;
   struct Node *left;
   struct Node *right;
+  struct Node *parent;
 };
 
 /* Node Linked List */

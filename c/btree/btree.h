@@ -18,9 +18,30 @@ void            walkTreePos       (struct Node *root);   // 08-33
 void            walkTreeIn        (struct Node *root);   // 08-35
 void            walkTreeLevel     (struct Node *root);   // 08-37
 void            insertNode        (struct Tree *T, struct Node *node);
-int             sizeTree          (struct Node *root);
+int             sizeTree          (struct Node *root); 
 
 void            walkTreeLevelLL   (struct Node *root); // 08-37
 void            insertNodeLL      (struct Tree *T, struct Node *node);
+
+// Exercicicio 1
+void            atualizaAltura       (struct Node *root);
+void            atualizaNivel        (struct Node *root);
+void            atualizaSomaChaveD   (struct Node *root);
+void            atualizaSomaChaveD2  (struct Node *root);
+void            atualizaSomaChaveD2c (struct Node *root);
+void            atualizaSomaChaveA   (struct Node *root);
+void            atualizaSomaChaveA2  (struct Node *root);
+void            atualizaPNivel       (struct Node *root);
+
+// Exercicio 2
+void            walkTreeLevelR       (struct Node *root); 
+
+
+// Exercicio 3
+int             compareTree          (struct Node *roota, struct Node *rootb); 
+
+// Exercicio 6.c
+int eFolha(struct Node *node);
+int somaFolha(struct Node *node);
 
 #endif

@@ -9,6 +9,7 @@ struct Node* newNode(int val)
   node->val = val;
   node->left = NULL;
   node->right = NULL;
+  node->parent = NULL;
   return node;
 }
 
