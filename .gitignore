@@ -11,6 +11,6 @@ BUILD/
 *~.*
 *.o
 .#*
-
+a.out
 __pycache__/
 

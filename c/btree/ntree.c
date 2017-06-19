@@ -2,6 +2,20 @@
 #include <stdbool.h>
 #include <stdio.h>
 
+/*
+ * TODO:
+ * traverse (pre,in,pos,level)
+ * node height
+ * isBalanced
+ * isAncestor
+ * number of Nodes
+ * number of children of root
+ * node depth
+ * find
+ * find_child_with_data
+ *
+ */
+
 // Struct to nAry tree
 struct nNode {
   int val;                  // Some value (in future use a pointer to some data)
@@ -11,6 +25,7 @@ struct nNode {
   struct nNode *children;   // Child node, other childs are found by moving next/prev
                             // if NULL is a leaf node
 };
+
 
 struct nNode* nNode_new(int val)
 {
@@ -27,11 +42,13 @@ struct nNode* nNode_new(int val)
   return node;
 }
 
+
 /* Free memory */
 void nNode_free(struct nNode *node)
 {
   free(node);
 }
+
 
 /* Recursively free a nTree
  * do not mantain the relationship
@@ -49,27 +66,18 @@ void nNodes_free(struct nNode *node)
   }
 }
 
+
 bool nNode_isRoot(struct nNode *node)
 {
   return (!node->parent && !node->prev && !node->next);
 }
+
 
 bool nNode_isLeaf(struct nNode *node)
 {
   return (!node->children);
 }
 
-
-/* Destroy a node and all childs and free it from memory
- * it keeps the relationships coherent (if not deleting  root)
- */
-void nNode_destroy(struct nNode *node)
-{
-  if(! nNode_isRoot(node))
-    nNode_unlink(node);
-
-  nNodes_free(node);
-}
 
 /* Removes a node from a tree, the node becomes the new tree */
 void nNode_unlink(struct nNode *node)
@@ -91,12 +99,39 @@ void nNode_unlink(struct nNode *node)
   node->prev = NULL;
 }
 
-int nNode_nth_child(struct nNode *parent, int position)
+
+/*
+ * nNode_destroy
+ * Destroy a node and all childs and free it from memory
+ * it keeps the relationships coherent (if not deleting  root)
+ */
+void nNode_destroy(struct nNode *node)
 {
-  return n;
+  if(! nNode_isRoot(node))
+    nNode_unlink(node);
+
+  nNodes_free(node);
 }
 
-/* Insert *node as a child of *parent and before *sibling
+
+/* nNode_nth_child
+ * Return a pointer to nth node, if member doesn't exist return NULL
+ */
+struct nNode* nNode_nth_child(struct nNode *parent, int position)
+{
+  struct nNode *node;
+  node = parent->children;
+  if(node) 
+    while ((position-- > 0) && node)
+      node = node->next;
+  
+  return node;
+}
+
+
+/*
+ * nNode_insert_before
+ * Insert *node as a child of *parent and before *sibling
  * if *sibling is NULL add as last sibling
  */
 struct nNode* nNode_insert_before(struct nNode *parent, struct nNode *sibling, struct nNode *node)
@@ -138,35 +173,74 @@ struct nNode* nNode_insert_before(struct nNode *parent, struct nNode *sibling, s
   return node;
 }
 
-/* Insert *node as a child of *parent and before *sibling
- * if *sibling is NULL add as last sibling
+
+/*
+ * nNode_insert_after
+ * Insert *node as a child of *parent and before *sibling
+ * if *sibling is NULL add as first sibling
  */
 struct nNode* nNode_insert_after(struct nNode *parent, struct nNode *sibling, struct nNode *node)
 {
+  node->parent = parent;
+
+  if (sibling) {
+    if (sibling->next) {
+      sibling->next->prev = node;
+    }
+    node->next = sibling->next;
+    node->prev = sibling;
+    sibling->next = node;
+  } else {
+    // sibling not passed,
+    // is there already an children
+    if(parent->children) {
+      node->next = parent->children;
+      parent->children->prev = node;
+    }
+    parent->children = node;
+  }
   return node;
 }
 
+
+/*
+ * nNode_prepend
+ * Insert the node as first child
+ */
 struct nNode* nNode_prepend(struct nNode *parent, struct nNode *node)
 {
-  return node;
+  return nNode_insert_before(parent, parent->children, node);
 }
 
+
+/*
+ * nNode_append
+ * Append a node as last child of parent
+ */
 struct nNode* nNode_append(struct nNode *parent, struct nNode *node)
 {
-  return node;
+  return nNode_insert_before(parent, NULL, node);
 }
 
+
+/*
+ * nNode_insert
+ * Insert Node under Parent in nth postion */
 struct nNode* nNode_insert(struct nNode *parent, int position, struct nNode *node)
 {
-  return node;
+  if(position > 0)
+    return nNode_insert_before(parent, nNode_nth_child(parent, position), node);
+  else if (position == 0)
+    return nNode_prepend(parent, node);
+  else
+    return nNode_append(parent,node);
 }
 
-
-// void nNode_insert(struct nNode *parent, int position, struct nNode *node);
 
 int main(void) {
 
   struct nNode *root;
+  
 
   /*                      1
    */
@@ -176,20 +250,9 @@ int main(void) {
    *            /---------|--------\
    *          2           3         4
    */
-
-  /* 2, 3 and 4 are brothers */
-  root->children                                = nNode_new(2);
-  root->children->next                          = nNode_new(3);
-  root->children->next->next                    = nNode_new(4);
-  
-  /* Make the parent relationship */
-  root->children->parent                        = root;
-  root->children->next->parent                  = root;
-  root->children->next->next->parent            = root;
-
-  /* Make brotherhood backwards relationship */
-  root->children->next->prev                    = root->children;
-  root->children->next->next->prev              = root->children->next;
+  nNode_insert(root, 2, nNode_new(2));
+  nNode_insert(root, 3, nNode_new(3));
+  nNode_insert(root, 4, nNode_new(4));
 
   /*                      1
    *            /---------|--------\
@@ -197,13 +260,8 @@ int main(void) {
    *        /   \                 
    *      5       6              
    */
-  root->children->children                      = nNode_new(5);
-  root->children->children->next                = nNode_new(6);
-
-  root->children->children->parent              = root->children;
-  root->children->children->next->parent        = root->children;
-
-  root->children->children->next->prev          = root->children->children;
+  nNode_insert(root->children, 5, nNode_new(5));
+  nNode_insert(root->children, 6, nNode_new(6));
 
   /*                      1
    *            /---------|--------\
@@ -211,10 +269,7 @@ int main(void) {
    *        /   \                 /
    *      5       6              7
    */
-  root->children->next->next->children          = nNode_new(7);
-  root->children->next->next->children->parent  = root->children->next->next;
-
-  /* After this things get real wild!!! */
+  nNode_insert(root->children->next->next, 7, nNode_new(7));
 
   nNodes_free(root);
 

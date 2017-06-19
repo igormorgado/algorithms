@@ -31,7 +31,7 @@ helper.o: helper.h
 
 
 clean:
-	rm -f *~ *.o $(PROG) core a.out testq test
+	rm -f *~ *.o $(PROG) core a.out testq test a.out
 
 valg: $(PROG)
 	valgrind -v --leak-check=full ./$(PROG)
