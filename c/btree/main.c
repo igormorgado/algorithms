@@ -17,9 +17,12 @@
  */       
 int main(void)
 {
-  struct Tree *T, *A;
+  struct Tree *T, *A, *B, *S, *N;
   newTree(&T);
   newTree(&A);
+  newTree(&B);
+  newTree(&S);
+  newTree(&N);
 
   int i; 
   for (i = 1; i <16; i++)
@@ -27,13 +30,37 @@ int main(void)
 
   for (i = 1; i <16; i++)
     insertNodeLL(A, newNode(i));
+
+  for (i = 1; i <16; i++)
+    insertNodeLL(B, newNode(i));
+
+  B->root->left->val = 5;
   
-  atualizaAltura(T->root);
-  atualizaNivel(T->root);
-  atualizaSomaChaveD(T->root);
-  atualizaSomaChaveD2(T->root);
-  atualizaSomaChaveA(T->root);
-  atualizaSomaChaveA2(T->root);
+  /*      2
+   *   4    5
+   */
+  insertNode(S, newNode(4));
+  insertNode(S, newNode(8));
+  insertNode(S, newNode(9));
+              
+  /*      2
+   *   3    4
+   */
+  insertNode(N, newNode(2));
+  insertNode(N, newNode(3));
+  insertNode(N, newNode(4));
+
+  // printf("A eq T? %d\n", compareTree(A->root, T->root));
+  // printf("B eq T? %d\n", compareTree(B->root, T->root));
+  printf("S in T? %d\n", isSubTree(S->root, T->root));
+  printf("N in T? %d\n", isSubTree(N->root, T->root));
+  
+  // atualizaAltura(T->root);
+  // atualizaNivel(T->root);
+  // atualizaSomaChaveD(T->root);
+  // atualizaSomaChaveD2(T->root);
+  // atualizaSomaChaveA(T->root);
+  // atualizaSomaChaveA2(T->root);
   // atualizaPNivel(T->root);
 
   // printf("Val de T é %d\n", T->root->val);
@@ -58,24 +85,28 @@ int main(void)
   // walkTreeLevelR(T->root);
   //
   
-  int j;
-  j=-1;
-  j=compareTree(T->root, A->root);
-  printf("Igual %d\n",j);
+  // int j;
+  // j=-1;
+  // j=compareTree(T->root, A->root);
+  // printf("Igual %d\n",j);
 
-  // Adding a difference
-  A->root->left->left->left->val = 1000;
-  j=-1;
-  j=compareTree(T->root, A->root);
-  printf("Igual %d\n",j);
+  // // Adding a difference
+  // A->root->left->left->left->val = 1000;
+  // j=-1;
+  // j=compareTree(T->root, A->root);
+  // printf("Igual %d\n",j);
 
-  printf("A->root->left->val %d\n",A->root->left->val);
-  printf("T->root->left->val %d\n",T->root->left->val);
+  // printf("A->root->left->val %d\n",A->root->left->val);
+  // printf("T->root->left->val %d\n",T->root->left->val);
 
-  printf("E' folha T->root? %d", eFolha(T->root->left->left->left));
-  printf("soma folha %d", somaFolha(T->root));
+  // printf("E' folha T->root? %d\n", eFolha(T->root->left->left->left));
+  // printf("soma folha %d\n", somaFolha(T->root));
 
+  destroyTree(&A);
   destroyTree(&T);
+  destroyTree(&N);
+  destroyTree(&S);
+  destroyTree(&B);
 
   return 0;
 }

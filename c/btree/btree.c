@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include "helper.h"
 #include "node.h"
 #include "btree.h"
@@ -340,35 +341,29 @@ void atualizaSomaChaveA2(struct Node *root)
 // }
 
 
-int  compareTree(struct Node *roota, struct Node *rootb)
+bool  compareTree(struct Node *a, struct Node *b)
 {
-  int status = 1;
-  if (roota && rootb) {
-    if ( compareTree(roota->left, rootb->left) != compareTree(roota->right, rootb->right)) 
-      status = 0;
-    if(roota->val != rootb->val) 
-      status = 0;
-  }
-  return status;
+  if ( (!a) && (!b) ) return true;
+  if ( (!a) || (!b) ) return false;
+
+  return ( a->val == b->val && 
+         compareTree(a->left,  b->left) && 
+         compareTree(a->right, b->right) );
 }
 
 
-// int  isSubTree(struct Node *sub, struct Node *root)
-// {
-//   int status = 1;
-//   if (roota != NULL && rootb !=NULL) {
-//     if ( compareTree(roota->left, rootb->left) != compareTree(roota->right, rootb->right)) 
-//       status = 0;
-//     if(roota->val != rootb->val) 
-//       status = 0;
-//   }
-// 
-//   return status;
-// 
-// }
+bool  isSubTree(struct Node *s, struct Node *r)
+{
+  if (!s) return true;
+  if (!r) return false;
+  
+  if(compareTree(s, r)) return true;
+
+  return isSubTree(s, r->left) || isSubTree(s, r->right);
+}
 
 
-int eFolha(struct Node *node)
+bool eFolha(struct Node *node)
 {
   return !(node->left || node->right);
 }

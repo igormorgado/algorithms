@@ -1,6 +1,7 @@
 #ifndef _BTREE_H
 #define _BTREE_H
 
+#include <stdbool.h>
 #include "node.h"
 
 /* Tree*/
@@ -38,10 +39,13 @@ void            walkTreeLevelR       (struct Node *root);
 
 
 // Exercicio 3
-int             compareTree          (struct Node *roota, struct Node *rootb); 
+bool             compareTree          (struct Node *roota, struct Node *rootb); 
+
+// Exercicio 4
+bool             isSubTree            (struct Node *sub, struct Node *root); 
 
 // Exercicio 6.c
-int eFolha(struct Node *node);
+bool eFolha(struct Node *node);
 int somaFolha(struct Node *node);
 
 #endif
