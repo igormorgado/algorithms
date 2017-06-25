@@ -35,13 +35,13 @@ struct nNode {
   struct nNode *prev;       // Siblings of same parent if prev == NULL is the first
   struct nNode *parent;     // Points to parent, if NULL is the root 
   struct nNode *children;   // Child node, other childs are found by moving next/prev
-                            // if NULL is a leaf node
+  // if NULL is a leaf node
 };
 
 struct NodeLL {
-	struct nNode  *node;
-	struct NodeLL *next;
-	struct NodeLL *prev;
+  struct nNode  *node;
+  struct NodeLL *next;
+  struct NodeLL *prev;
 };
 
 struct QueueLL {
@@ -90,7 +90,7 @@ struct nNode *dequeueLL(struct QueueLL *queue)
   oldhead = queue->head;
 
   queue->head = queue->head->next;
-	//queue->head->prev = NULL;
+  //queue->head->prev = NULL;
 
   if (queue->head == NULL)
     queue->tail = NULL;
@@ -129,22 +129,22 @@ int QueueSizeLL(struct QueueLL *queue)
 int enqueueLL(struct QueueLL *queue, struct nNode *root) 
 {
 
-	/* Allocates space to the new element on queue */
+  /* Allocates space to the new element on queue */
   struct NodeLL *new;
   new = malloc(sizeof *new);
   new->node = root;
   new->next = NULL;
-	//new->prev = NULL;
+  //new->prev = NULL;
 
-	/* If isn't the first element point the
+  /* If isn't the first element point the
    * actual tail next to the new NodeLL
    */
   if (queue->tail != NULL ) {
     queue->tail->next = new;
     //queue->tail->next->prev = queue->tail;
-	}
+  }
 
-	/* Point tail to the new Node */
+  /* Point tail to the new Node */
   queue->tail = new;
 
   if (queue->head == NULL)
@@ -260,7 +260,7 @@ struct nNode* nNode_nth_child(struct nNode *parent, int position)
   if(node) 
     while ((position-- > 0) && node)
       node = node->next;
-  
+
   return node;
 }
 
@@ -491,10 +491,10 @@ bool nNode_traverse_preOrder(
     return NNODE_CONT_TRAVERSE;
   if((flags & TRAVERSE_NON_LEAVES) && (! nNode_isLeaf(node)) && visit(node, val))
     return NNODE_CONT_TRAVERSE;
-  
+
   struct nNode *child;
   child = node->children;
-  
+
   while(child)
   {
     struct nNode *current;
@@ -561,13 +561,13 @@ void nNode_traverse_inOrder(
       sibling = sibling->next;
     }
   } else {
-      if((flags & TRAVERSE_LEAVES)     &&    nNode_isLeaf(node) ) visit(node, val);
-      if((flags & TRAVERSE_NON_LEAVES) && (! nNode_isLeaf(node))) visit(node, val);
+    if((flags & TRAVERSE_LEAVES)     &&    nNode_isLeaf(node) ) visit(node, val);
+    if((flags & TRAVERSE_NON_LEAVES) && (! nNode_isLeaf(node))) visit(node, val);
   }
 }
 
 void nNode_traverse_levelOrder(struct nNode* node,
-	TraverseFlags flags, nNodeTraverseFunc visit, int val) {
+    TraverseFlags flags, nNodeTraverseFunc visit, int val) {
 
   struct QueueLL* queue = newQueueLL();
 
@@ -579,11 +579,11 @@ void nNode_traverse_levelOrder(struct nNode* node,
     if((flags & TRAVERSE_LEAVES)     &&    nNode_isLeaf(head) ) visit(head, val);
     if((flags & TRAVERSE_NON_LEAVES) && (! nNode_isLeaf(head))) visit(head, val);
 
-		struct nNode *child = head->children;
-		while(child) {
+    struct nNode *child = head->children;
+    while(child) {
       enqueueLL(queue, child);
-			child = child->next;
-		}
+      child = child->next;
+    }
   }
   destroyQueueLL(queue);
 }
@@ -627,7 +627,7 @@ int nNode_n_leaves(struct nNode *node)
 {
   return nNode_count(node, TRAVERSE_LEAVES);
 }
-  
+
 
 /* 
  * nNode_n_nonLeaves
@@ -637,7 +637,7 @@ int nNode_n_nonLeaves(struct nNode *node)
 {
   return nNode_count(node, TRAVERSE_NON_LEAVES);
 }
-  
+
 /* 
  * nNode_n_nodes
  * Count the number of nonleaves under node
@@ -646,7 +646,7 @@ int nNode_n_nodes(struct nNode *node)
 {
   return nNode_count(node, TRAVERSE_ALL);
 }
-  
+
 
 /*
  * nNode_find_func
@@ -654,14 +654,14 @@ int nNode_n_nodes(struct nNode *node)
  */
 bool nNode_find_func(struct nNode *node, int val)
 {
-   if (node->val == val)
-   {
-     return NNODE_STOP_TRAVERSE;
-   }
-   else
-   {
-     return NNODE_CONT_TRAVERSE;
-   }
+  if (node->val == val)
+  {
+    return NNODE_STOP_TRAVERSE;
+  }
+  else
+  {
+    return NNODE_CONT_TRAVERSE;
+  }
 }
 
 struct nNode* nNode_find(struct nNode *node, int val)
@@ -673,7 +673,7 @@ struct nNode* nNode_find(struct nNode *node, int val)
   struct nNode *child = node->children;
   while(child) {
     if(nNode_find(child, val)) return child;
-    
+
     // We didn't found on child, lets check his brothers
     struct nNode *sibling = child->next;
     while(sibling) {
@@ -691,10 +691,10 @@ struct nNode* nNode_find(struct nNode *node, int val)
 int main(void) {
 
   struct nNode *root;
-  
+
 
   /*                      1
-   */
+  */
   root = nNode_new(1);
 
   /*                      1
@@ -795,7 +795,7 @@ int main(void) {
 
   return 0;
 }
-  
+
 
 
 
