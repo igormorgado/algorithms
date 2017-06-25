@@ -38,6 +38,126 @@ struct nNode {
                             // if NULL is a leaf node
 };
 
+struct NodeLL {
+	struct nNode  *node;
+	struct NodeLL *next;
+	struct NodeLL *prev;
+};
+
+struct QueueLL {
+  struct NodeLL *head;
+  struct NodeLL *tail;
+  int size;
+};
+
+/* 
+ * QUEUE FUNCTIONS
+ */
+
+struct QueueLL* newQueueLL() 
+{
+  struct QueueLL *queue;
+  queue = malloc(sizeof *queue);
+
+  queue->head = NULL;
+  queue->tail = NULL;
+  queue->size = 0;
+
+  return queue;
+}
+
+int isQueueEmptyLL(struct QueueLL *queue) 
+{
+  return ( queue->head  == NULL ) && (queue->tail == NULL);
+}
+
+
+int isQueueSingleLL(struct QueueLL *queue) 
+{
+  return ( queue->head == queue->tail ) && (queue->head != NULL);
+}
+
+struct nNode *dequeueLL(struct QueueLL *queue)
+{
+  if (queue->head == NULL)
+    return NULL;
+
+  struct nNode *first;
+
+  first = queue->head->node;
+
+  struct NodeLL *oldhead;
+  oldhead = queue->head;
+
+  queue->head = queue->head->next;
+	//queue->head->prev = NULL;
+
+  if (queue->head == NULL)
+    queue->tail = NULL;
+
+  free(oldhead);
+  (queue->size)--;
+
+  return first;
+}
+
+
+void destroyQueueLL(struct QueueLL *queue) 
+{
+  while(!isQueueEmptyLL(queue)) dequeueLL(queue);
+  queue->head = NULL;
+  queue->tail = NULL;
+  queue->size = 0;
+  free(queue);
+  queue = NULL;
+}
+
+
+struct nNode* peekQueueLL(struct QueueLL *queue) 
+{
+  return queue->head->node;
+}
+
+
+
+int QueueSizeLL(struct QueueLL *queue) 
+{
+  return queue->size;
+}
+
+
+int enqueueLL(struct QueueLL *queue, struct nNode *root) 
+{
+
+	/* Allocates space to the new element on queue */
+  struct NodeLL *new;
+  new = malloc(sizeof *new);
+  new->node = root;
+  new->next = NULL;
+	//new->prev = NULL;
+
+	/* If isn't the first element point the
+   * actual tail next to the new NodeLL
+   */
+  if (queue->tail != NULL ) {
+    queue->tail->next = new;
+    //queue->tail->next->prev = queue->tail;
+	}
+
+	/* Point tail to the new Node */
+  queue->tail = new;
+
+  if (queue->head == NULL)
+    queue->head = queue->tail;
+
+  return ++(queue->size);
+}
+
+
+
+/*
+ * nTree functions
+ */
 
 struct nNode* nNode_new(int val)
 {
@@ -446,6 +566,47 @@ void nNode_traverse_inOrder(
   }
 }
 
+bool nNode_traverse_levelOrder(
+    struct              nNode *node,
+    TraverseFlags       flags,
+    nNodeTraverseFunc   visit,
+    int                 val)
+{
+  struct nNode *child;
+  struct nNode *sibling;
+  struct nNode *next;
+
+  struct QueueLL *queue;
+  queue = newQueueLL();
+
+  enqueueLL(queue, node);
+
+  while (! isQueueEmptyLL(queue)) {
+    next = dequeueLL(queue);
+
+    if(next) {
+      if((flags & TRAVERSE_LEAVES)     &&    nNode_isLeaf(next) ) visit(next, val);
+      if((flags & TRAVERSE_NON_LEAVES) && (! nNode_isLeaf(next))) visit(next, val);
+
+      child = next->children;
+      while(child) {
+        enqueueLL(queue, child);
+        sibling = child->next;
+        while(sibling) {
+          enqueueLL(queue, sibling);
+          sibling = sibling->next;
+        }
+        child = child->children;
+      }
+    }
+  }
+
+  destroyQueueLL(queue);
+  queue = NULL;
+
+  return true;
+}
+
 /*
  * nNode_count
  * 
@@ -545,8 +706,6 @@ struct nNode* nNode_find(struct nNode *node, int val)
   return NULL;
 }
 
-
-
 int main(void) {
 
   struct nNode *root;
@@ -631,6 +790,15 @@ int main(void) {
   // printf("\n");   
   // nNode_traverse_inOrder(root, TRAVERSE_NON_LEAVES, (nNodeTraverseFunc) nNode_print, 0);
   // printf("\n");
+
+  printf("\n");
+  printf("LVL 1 2 _3 4 _5 _6 _7\n");
+  nNode_traverse_levelOrderA(root, TRAVERSE_ALL, (nNodeTraverseFunc)nNode_print, 0);
+  printf("\n");   
+  nNode_traverse_levelOrderA(root, TRAVERSE_LEAVES, (nNodeTraverseFunc) nNode_print, 0);
+  printf("\n");   
+  nNode_traverse_levelOrderA(root, TRAVERSE_NON_LEAVES, (nNodeTraverseFunc) nNode_print, 0);
+  printf("\n");
 
   printf("N leaves %d\n",nNode_n_leaves(root));
   printf("N nonleaves %d\n",nNode_n_nonLeaves(root)); 
