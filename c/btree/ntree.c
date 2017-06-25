@@ -4,17 +4,29 @@
 
 /*
  * TODO:
- * traverse (pre,in,pos,level)
- * node height
+ * traverse (level)
  * isBalanced
- * isAncestor
- * number of Nodes
- * number of children of root
- * node depth
- * find
- * find_child_with_data
- *
  */
+
+#define NNODE_STOP_TRAVERSE true;
+#define NNODE_CONT_TRAVERSE false;
+
+typedef enum
+{
+  TRAVERSE_LEAVES = 1 << 0,
+  TRAVERSE_NON_LEAVES = 1 << 1,
+  TRAVERSE_ALL = TRAVERSE_LEAVES | TRAVERSE_NON_LEAVES,
+  TRAVERSE_MASK = 0x03
+} TraverseFlags;
+
+typedef enum
+{
+  INORDER,
+  PREORDER,
+  POSTORDER,
+  LEVELORDER
+} TraverseType;
+
 
 // Struct to nAry tree
 struct nNode {
@@ -41,6 +53,10 @@ struct nNode* nNode_new(int val)
 
   return node;
 }
+
+// Generic TraverseFunc
+typedef bool (*nNodeTraverseFunc) (struct nNode *node, int val);
+
 
 
 /* Free memory */
@@ -237,6 +253,300 @@ struct nNode* nNode_insert(struct nNode *parent, int position, struct nNode *nod
 }
 
 
+/*
+ * nNode_height
+ * Return the node height
+ */
+int nNode_height(struct nNode *node)
+{
+
+  int height = 0;
+  int child_height = 0;
+
+  struct nNode *child;
+
+  if (!node)
+    return 0;
+
+  child = node->children;
+  while(child) {
+
+    child_height = nNode_height(child);
+
+    if (child_height > height ) 
+      height = child_height;
+
+    child = child->next;
+  }
+
+  return height + 1;
+}
+
+/*
+ * nNode_depth
+ * Return the node depth
+ */
+int nNode_depth(struct nNode *node)
+{
+  int depth = 0;
+
+  while(node) {
+    node = node->parent;
+    depth++;
+  }
+  return depth;
+}
+
+/*
+ * nNode_n_children
+ * Return the nuber of children of node
+ */
+int nNode_n_children(struct nNode *node)
+{
+
+  int n = 0;
+
+  while(node) {
+    node = node->next;
+    n++;
+  }
+
+  return n;
+}
+
+/*
+ * Check if *ancestor of *node
+ */
+bool nNode_isAncestor(struct nNode *node, struct nNode *ancestor)
+{
+  while(node) {
+    if (node->parent == ancestor)
+      return true;
+    node = node->parent;
+  }
+  return false;
+}
+
+bool nNode_isAncestorRec(struct nNode *node, struct nNode *ancestor)
+{
+  if (node->parent == ancestor) return true;
+  return nNode_isAncestor(node->parent, ancestor) || false;
+}
+
+
+/*
+ * Check if *descendant of *node
+ */
+bool nNode_isDescendant(struct nNode *node, struct nNode *descendant)
+{
+  return nNode_isAncestor(descendant, node);
+}
+
+
+struct nNode* nNode_getRoot(struct nNode *node)
+{
+  while(node->parent) node = node->parent;
+
+  return node;
+}
+
+/*
+ * nNode_print
+ * Function to be passed to check traverse
+ */
+bool nNode_print(struct nNode *node, int val) 
+{
+  printf("Node val: %d\n", node->val);
+  return NNODE_CONT_TRAVERSE;
+}
+
+
+bool nNode_traverse_preOrder(
+    struct             nNode *node, 
+    TraverseFlags      flags, 
+    nNodeTraverseFunc  visit,
+    int                val )
+{
+  if((flags & TRAVERSE_LEAVES)     &&    nNode_isLeaf(node)  && visit(node, val))
+    return NNODE_CONT_TRAVERSE;
+  if((flags & TRAVERSE_NON_LEAVES) && (! nNode_isLeaf(node)) && visit(node, val))
+    return NNODE_CONT_TRAVERSE;
+  
+  struct nNode *child;
+  child = node->children;
+  
+  while(child)
+  {
+    struct nNode *current;
+    current = child;
+    child = current->next;
+
+    nNode_traverse_preOrder(current, flags, visit, val);
+  }
+
+  return NNODE_STOP_TRAVERSE;
+}
+
+
+void nNode_traverse_posOrder(
+    struct             nNode *node, 
+    TraverseFlags      flags, 
+    nNodeTraverseFunc  visit,
+    int                val )
+{
+
+  struct nNode *child;
+  child = node->children;
+
+  while(child)
+  {
+    struct nNode *current;
+    current = child;
+
+    child = current->next;
+
+    nNode_traverse_posOrder(current, flags, visit, val);
+  }
+
+  if((flags & TRAVERSE_LEAVES)     &&    nNode_isLeaf(node) ) visit(node, val);
+  if((flags & TRAVERSE_NON_LEAVES) && (! nNode_isLeaf(node))) visit(node, val);
+
+}
+
+/* nNode_traverse_inOrder
+ * We assume inOder means to visit the first child before all others
+ */
+void nNode_traverse_inOrder(
+    struct             nNode *node, 
+    TraverseFlags      flags, 
+    nNodeTraverseFunc  visit,
+    int                val )
+{
+  if (node->children)
+  {
+    struct nNode *sibling;
+    struct nNode *current;
+
+    current = node->children;
+    sibling = current->next;
+
+    nNode_traverse_inOrder(current, flags, visit, val);
+
+    if((flags & TRAVERSE_LEAVES)     &&    nNode_isLeaf(node) ) visit(node, val);
+    if((flags & TRAVERSE_NON_LEAVES) && (! nNode_isLeaf(node))) visit(node, val);
+
+    while(sibling)
+    {
+      nNode_traverse_inOrder(sibling, flags, visit, val);
+      sibling = sibling->next;
+    }
+  } else {
+      if((flags & TRAVERSE_LEAVES)     &&    nNode_isLeaf(node) ) visit(node, val);
+      if((flags & TRAVERSE_NON_LEAVES) && (! nNode_isLeaf(node))) visit(node, val);
+  }
+}
+
+/*
+ * nNode_count
+ * 
+ */
+void nNode_count_func(struct nNode *node, TraverseFlags flags, int *n)
+{
+  if (node->children)
+  {
+    struct nNode *child;
+
+    if (flags & TRAVERSE_NON_LEAVES) (*n)++;
+
+    child = node->children;
+
+    while(child)
+    {
+      nNode_count_func(child, flags, n);
+      child = child->next;
+    }
+  } else if (flags & TRAVERSE_LEAVES) (*n)++;
+}
+
+int nNode_count(struct nNode *node, TraverseFlags flags)
+{
+  int n = 0;
+  nNode_count_func(node, flags, &n);
+
+  return n;
+}
+
+/*
+ * nNode_n_leaves
+ * Count the number of leaves under node
+ */
+int nNode_n_leaves(struct nNode *node)
+{
+  return nNode_count(node, TRAVERSE_LEAVES);
+}
+  
+
+/* 
+ * nNode_n_nonLeaves
+ * Count the number of nonleaves under node
+ */
+int nNode_n_nonLeaves(struct nNode *node)
+{
+  return nNode_count(node, TRAVERSE_NON_LEAVES);
+}
+  
+/* 
+ * nNode_n_nodes
+ * Count the number of nonleaves under node
+ */
+int nNode_n_nodes(struct nNode *node)
+{
+  return nNode_count(node, TRAVERSE_ALL);
+}
+  
+
+/*
+ * nNode_find_func
+ * Returns  TRUE if node->val == val
+ */
+bool nNode_find_func(struct nNode *node, int val)
+{
+   if (node->val == val)
+   {
+     return NNODE_STOP_TRAVERSE;
+   }
+   else
+   {
+     return NNODE_CONT_TRAVERSE;
+   }
+}
+
+struct nNode* nNode_find(struct nNode *node, int val)
+{
+  // We found the node return the pointer
+  if(nNode_find_func(node, val)) return node;
+
+  // We didn't found le's check the children
+  struct nNode *child = node->children;
+  while(child) {
+    if(nNode_find(child, val)) return child;
+    
+    // We didn't found on child, lets check his brothers
+    struct nNode *sibling = child->next;
+    while(sibling) {
+      if(nNode_find(sibling, val)) return sibling;
+      sibling = sibling->next;
+    }
+
+    child = child->children;
+
+  }
+  // We didn't found the element return NULL
+  return NULL;
+}
+
+
+
 int main(void) {
 
   struct nNode *root;
@@ -271,7 +581,67 @@ int main(void) {
    */
   nNode_insert(root->children->next->next, 7, nNode_new(7));
 
+  printf("\n");
+  printf("Root height %d\n", nNode_height(root));
+  printf("Root level %d\n", nNode_depth(root));
+  printf("Root child %d\n", nNode_n_children(root));
+  printf("2 child %d\n", nNode_n_children(root->children));
+  printf("3 level %d\n", nNode_depth(root->children));
+
+  printf("\n");
+  printf("root isAnc root %d\n",             nNode_isAncestor(root,root));
+  printf("root isAnc root-child %d\n",       nNode_isAncestor(root->children,root));
+  printf("root isAnc root-child-child %d\n", nNode_isAncestor(root->children->children,root));
+  printf("root->2 isAnc root->3 %d\n",       nNode_isAncestor(root->children->next,root->children));
+
+  printf("\n");
+  printf("root isAnc root %d\n",             nNode_isAncestorRec(root,root));
+  printf("root isAnc root-child %d\n",       nNode_isAncestorRec(root->children,root));
+  printf("root isAnc root-child-child %d\n", nNode_isAncestorRec(root->children->children,root));
+  printf("root->2 isAnc root->3 %d\n",       nNode_isAncestorRec(root->children->next,root->children));
+
+  printf("\n");
+  printf("root-child-child isDes root %d\n", nNode_isDescendant(root,root->children->children));
+  printf("root->3 isDes root->2 %d\n",       nNode_isDescendant(root->children->next,root->children));
+
+
+  printf("\n");
+  printf("PRE 1 2 _5 _6 _3 4 _7\n");
+  nNode_traverse_preOrder(root, TRAVERSE_ALL, (nNodeTraverseFunc)nNode_print, 0);
+  printf("\n");
+  nNode_traverse_preOrder(root, TRAVERSE_LEAVES, (nNodeTraverseFunc) nNode_print, 0);
+  printf("\n");
+  nNode_traverse_preOrder(root, TRAVERSE_NON_LEAVES, (nNodeTraverseFunc) nNode_print, 0);
+  printf("\n");
+
+  // printf("\n");
+  // printf("POS _5 _6 2 _3 _7 4 1\n");
+  // nNode_traverse_posOrder(root, TRAVERSE_ALL, (nNodeTraverseFunc)nNode_print, 0);
+  // printf("\n");   
+  // nNode_traverse_posOrder(root, TRAVERSE_LEAVES, (nNodeTraverseFunc) nNode_print, 0);
+  // printf("\n");   
+  // nNode_traverse_posOrder(root, TRAVERSE_NON_LEAVES, (nNodeTraverseFunc) nNode_print, 0);
+  // printf("\n");
+
+  // printf("\n");
+  // printf("IN _5 2 _6 1 _3 _7 4\n");
+  // nNode_traverse_inOrder(root, TRAVERSE_ALL, (nNodeTraverseFunc)nNode_print, 0);
+  // printf("\n");   
+  // nNode_traverse_inOrder(root, TRAVERSE_LEAVES, (nNodeTraverseFunc) nNode_print, 0);
+  // printf("\n");   
+  // nNode_traverse_inOrder(root, TRAVERSE_NON_LEAVES, (nNodeTraverseFunc) nNode_print, 0);
+  // printf("\n");
+
+  printf("N leaves %d\n",nNode_n_leaves(root));
+  printf("N nonleaves %d\n",nNode_n_nonLeaves(root)); 
+  printf("N nodes %d\n",nNode_n_nodes(root)); 
+
+  struct nNode *nfind;
+  nfind = nNode_find(root,3);
+  if(nfind) nNode_print(nfind,0);
+
   nNodes_free(root);
+
 
   return 0;
 }
