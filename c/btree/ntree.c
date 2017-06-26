@@ -722,56 +722,56 @@ int main(void) {
    */
   nNode_insert(root->children->next->next, 7, nNode_new(7));
 
-  // printf("\n");
-  // printf("Root height %d\n", nNode_height(root));
-  // printf("Root level %d\n", nNode_depth(root));
-  // printf("Root child %d\n", nNode_n_children(root));
-  // printf("2 child %d\n", nNode_n_children(root->children));
-  // printf("3 level %d\n", nNode_depth(root->children));
+  printf("\n");
+  printf("Root height %d\n", nNode_height(root));
+  printf("Root level %d\n", nNode_depth(root));
+  printf("Root child %d\n", nNode_n_children(root));
+  printf("2 child %d\n", nNode_n_children(root->children));
+  printf("3 level %d\n", nNode_depth(root->children));
 
-  // printf("\n");
-  // printf("root isAnc root %d\n",             nNode_isAncestor(root,root));
-  // printf("root isAnc root-child %d\n",       nNode_isAncestor(root->children,root));
-  // printf("root isAnc root-child-child %d\n", nNode_isAncestor(root->children->children,root));
-  // printf("root->2 isAnc root->3 %d\n",       nNode_isAncestor(root->children->next,root->children));
+  printf("\n");
+  printf("root isAnc root %d\n",             nNode_isAncestor(root,root));
+  printf("root isAnc root-child %d\n",       nNode_isAncestor(root->children,root));
+  printf("root isAnc root-child-child %d\n", nNode_isAncestor(root->children->children,root));
+  printf("root->2 isAnc root->3 %d\n",       nNode_isAncestor(root->children->next,root->children));
 
-  // printf("\n");
-  // printf("root isAnc root %d\n",             nNode_isAncestorRec(root,root));
-  // printf("root isAnc root-child %d\n",       nNode_isAncestorRec(root->children,root));
-  // printf("root isAnc root-child-child %d\n", nNode_isAncestorRec(root->children->children,root));
-  // printf("root->2 isAnc root->3 %d\n",       nNode_isAncestorRec(root->children->next,root->children));
+  printf("\n");
+  printf("root isAnc root %d\n",             nNode_isAncestorRec(root,root));
+  printf("root isAnc root-child %d\n",       nNode_isAncestorRec(root->children,root));
+  printf("root isAnc root-child-child %d\n", nNode_isAncestorRec(root->children->children,root));
+  printf("root->2 isAnc root->3 %d\n",       nNode_isAncestorRec(root->children->next,root->children));
 
-  // printf("\n");
-  // printf("root-child-child isDes root %d\n", nNode_isDescendant(root,root->children->children));
-  // printf("root->3 isDes root->2 %d\n",       nNode_isDescendant(root->children->next,root->children));
+  printf("\n");
+  printf("root-child-child isDes root %d\n", nNode_isDescendant(root,root->children->children));
+  printf("root->3 isDes root->2 %d\n",       nNode_isDescendant(root->children->next,root->children));
 
 
   printf("\n");
   printf("PRE 1 2 _5 _6 _3 4 _7\n");
   nNode_traverse_preOrder(root, TRAVERSE_ALL, (nNodeTraverseFunc)nNode_print, 0);
-  // printf("\n");
-  // nNode_traverse_preOrder(root, TRAVERSE_LEAVES, (nNodeTraverseFunc) nNode_print, 0);
-  // printf("\n");
-  // nNode_traverse_preOrder(root, TRAVERSE_NON_LEAVES, (nNodeTraverseFunc) nNode_print, 0);
-  // printf("\n");
+  printf("\n");
+  nNode_traverse_preOrder(root, TRAVERSE_LEAVES, (nNodeTraverseFunc) nNode_print, 0);
+  printf("\n");
+  nNode_traverse_preOrder(root, TRAVERSE_NON_LEAVES, (nNodeTraverseFunc) nNode_print, 0);
+  printf("\n");
 
   printf("\n");
   printf("POS _5 _6 2 _3 _7 4 1\n");
   nNode_traverse_posOrder(root, TRAVERSE_ALL, (nNodeTraverseFunc)nNode_print, 0);
-  // printf("\n");   
-  // nNode_traverse_posOrder(root, TRAVERSE_LEAVES, (nNodeTraverseFunc) nNode_print, 0);
-  // printf("\n");   
-  // nNode_traverse_posOrder(root, TRAVERSE_NON_LEAVES, (nNodeTraverseFunc) nNode_print, 0);
-  // printf("\n");
+  printf("\n");   
+  nNode_traverse_posOrder(root, TRAVERSE_LEAVES, (nNodeTraverseFunc) nNode_print, 0);
+  printf("\n");   
+  nNode_traverse_posOrder(root, TRAVERSE_NON_LEAVES, (nNodeTraverseFunc) nNode_print, 0);
+  printf("\n");
 
   printf("\n");
   printf("IN _5 2 _6 1 _3 _7 4\n");
   nNode_traverse_inOrder(root, TRAVERSE_ALL, (nNodeTraverseFunc)nNode_print, 0);
-  // printf("\n");   
-  // nNode_traverse_inOrder(root, TRAVERSE_LEAVES, (nNodeTraverseFunc) nNode_print, 0);
-  // printf("\n");   
-  // nNode_traverse_inOrder(root, TRAVERSE_NON_LEAVES, (nNodeTraverseFunc) nNode_print, 0);
-  // printf("\n");
+  printf("\n");   
+  nNode_traverse_inOrder(root, TRAVERSE_LEAVES, (nNodeTraverseFunc) nNode_print, 0);
+  printf("\n");   
+  nNode_traverse_inOrder(root, TRAVERSE_NON_LEAVES, (nNodeTraverseFunc) nNode_print, 0);
+  printf("\n");
 
   printf("\n");
   printf("LVL 1 2 _3 4 _5 _6 _7\n");
@@ -782,13 +782,13 @@ int main(void) {
   nNode_traverse_levelOrder(root, TRAVERSE_NON_LEAVES, (nNodeTraverseFunc) nNode_print, 0);
   printf("\n");
 
-  // printf("N leaves %d\n",nNode_n_leaves(root));
-  // printf("N nonleaves %d\n",nNode_n_nonLeaves(root)); 
-  // printf("N nodes %d\n",nNode_n_nodes(root)); 
+  printf("N leaves %d\n",nNode_n_leaves(root));
+  printf("N nonleaves %d\n",nNode_n_nonLeaves(root)); 
+  printf("N nodes %d\n",nNode_n_nodes(root)); 
 
-  // struct nNode *nfind;
-  // nfind = nNode_find(root,3);
-  // if(nfind) nNode_print(nfind,0);
+  struct nNode *nfind;
+  nfind = nNode_find(root,3);
+  if(nfind) nNode_print(nfind,0);
 
   nNodes_free(root);
 
