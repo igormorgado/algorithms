@@ -31,10 +31,6 @@ struct No {
   struct No *dir;
 };
 
-
-/* Cria um novo No e retorna o ponteiro para ele */
-// struct No* no_Novo(struct TElem elem);
-
 /* Executa percurso a partir do elemento x */
 void no_PercursoInOrdem (struct No *x);
 void no_PercursoPreOrdem(struct No *x);
@@ -191,14 +187,48 @@ void abb_Insere(struct abb *T, TChave c, struct TElem *x)
     q->esq   = NULL;
     q->dir   = NULL;
   } else {
-    printf("Chave existente");
+    printf("Chave existente %d\n", c);
   }
 }
 
 struct TElem* abb_Remove(struct abb *T, TChave c)
 {
+  struct No *q;
+  struct No **pontq;
+  struct TElem *x;
 
+  x = abb_BuscaPos(T, c, pontq);
+
+  if (x) {
+    q = *pontq;
+
+    if (q->esq) {
+      if(! q->esq->dir) {
+        q->esq->dir = q->dir;
+        *pontq = q->esq;
+      } else {
+        struct No *qmenor = q->esq->dir;
+        struct No *paiqmenor = q->esq;
+        while(qmenor->dir) {
+          qmenor = qmenor->dir;
+          paiqmenor = qmenor;
+          paiqmenor->dir = qmenor->esq;
+          qmenor->esq = q->esq;
+          qmenor->dir = q->dir;
+          *pontq = qmenor;
+        }
+      }
+    } else {
+      *pontq = q->dir;
+    }
+    free(q);
+    return x;
+  } else {
+    printf("Chave inexistente %d\n", c);
+    return NULL;
+  }
 }
+
 /* **********************************************
  * END: abb.c
  ********************************************* */
