@@ -81,6 +81,26 @@ void abb_PercursoPosOrdem(struct abb *T);
 
 
 /* **********************************************
+ * BEGIN: elem.c
+ ********************************************* */
+
+struct TElem* elem_Novo(int val)
+{
+  struct TElem *x;
+
+  x = malloc(sizeof *x);
+  x->val = val;
+
+  return x;
+}
+
+/* **********************************************
+ * END: elem.c
+ ********************************************* */
+
+
+
+/* **********************************************
  * BEGIN: no.c
  ********************************************* */
 
@@ -177,6 +197,7 @@ void abb_Insere(struct abb *T, TChave c, struct TElem *x)
   struct No *q;
   struct TElem *v;
   
+  posins = malloc(sizeof *posins);
   v = abb_BuscaPos(T, c, posins);
 
   if (!v) {
@@ -189,6 +210,8 @@ void abb_Insere(struct abb *T, TChave c, struct TElem *x)
   } else {
     printf("Chave existente %d\n", c);
   }
+
+  free(posins);
 }
 
 struct TElem* abb_Remove(struct abb *T, TChave c)
@@ -197,6 +220,7 @@ struct TElem* abb_Remove(struct abb *T, TChave c)
   struct No **pontq;
   struct TElem *x;
 
+  pontq = malloc(sizeof *pontq);
   x = abb_BuscaPos(T, c, pontq);
 
   if (x) {
@@ -222,9 +246,11 @@ struct TElem* abb_Remove(struct abb *T, TChave c)
       *pontq = q->dir;
     }
     free(q);
+    free(pontq);
     return x;
   } else {
     printf("Chave inexistente %d\n", c);
+    free(pontq);
     return NULL;
   }
 }
@@ -234,5 +260,19 @@ struct TElem* abb_Remove(struct abb *T, TChave c)
  ********************************************* */
 
 int main(void) {
+
+  struct abb *T;
+  T = malloc(sizeof *T);
+  T->raiz = NULL;
+
+  
+  TChave c = 1;
+  struct TElem *x = elem_Novo(1);
+
+  abb_Insere(T, c, x);
+  abb_Remove(T, 1);
+
+  free(T);
+
   return 0;
 }
