@@ -1,13 +1,17 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 /* **********************************************
  * BEGIN: elem.h
  ********************************************* */
 
+typedef struct TElem TElem;
 struct TElem {
+  bool status;
   int val;
 };
+
 
 /* Cria um novo TElem e atribui um valor a ele */
 struct TElem* elem_Novo(int val);
@@ -24,12 +28,14 @@ struct TElem* elem_Novo(int val);
 
 typedef int TChave;
 
+typedef struct No No;
 struct No {
   TChave chave;
-  struct TElem *elem;
-  struct No *esq;
-  struct No *dir;
+  TElem *elem;
+  No *esq;
+  No *dir;
 };
+
 
 /* Executa percurso a partir do elemento x */
 void no_PercursoInOrdem (struct No *x);
@@ -47,31 +53,33 @@ void no_PercursoPosOrdem(struct No *x);
  * BEGIN: abb.h
  ********************************************* */
 
+typedef struct abb abb;
 struct abb {
-  struct No *raiz;
+  No *raiz;
 };
 
+
 /* Constroi arvore */
-void abb_Constroi(struct abb *T);
+void abb_Constroi(abb *T);
 
 /* Enumera(LISTA) cada chave de T ordenadamente */
-void abb_Enumera(struct abb *T);
+void abb_Enumera(abb *T);
 
 /* Obetem o elemento de T com chave c ou NULO se inexistente */
-struct TElem* abb_Busca(struct abb *T, TChave c);
+TElem* abb_Busca_(abb *T, TChave c);
 
-struct TElem* abb_BuscaPos(struct abb *T, TChave c, struct No **PosIns);
+TElem* abb_Busca(abb *T, TChave c, No **PosIns);
 
 /* Insere Elemento x com chave c em T */
-void abb_Insere(struct abb *T, TChave c, struct TElem *x);
+void abb_Insere(abb *T, TChave c, TElem *x);
 
 /* Remove e retorna o elemento de T com chave c */
-struct TElem* abb_Remove(struct abb *T, TChave c);
+TElem* abb_Remove(abb *T, TChave c);
 
 /* Executa percurso a partir da raiz de T */
-void abb_PercursoInOrdem (struct abb *T);
-void abb_PercursoPreOrdem(struct abb *T);
-void abb_PercursoPosOrdem(struct abb *T);
+void abb_PercursoInOrdem (abb *T);
+void abb_PercursoPreOrdem(abb *T);
+void abb_PercursoPosOrdem(abb *T);
 
 
 /* **********************************************
@@ -84,12 +92,13 @@ void abb_PercursoPosOrdem(struct abb *T);
  * BEGIN: elem.c
  ********************************************* */
 
-struct TElem* elem_Novo(int val)
+TElem* elem_Novo(int val)
 {
-  struct TElem *x;
+  TElem *x;
 
   x = malloc(sizeof *x);
   x->val = val;
+  x->status = true;
 
   return x;
 }
@@ -104,7 +113,7 @@ struct TElem* elem_Novo(int val)
  * BEGIN: no.c
  ********************************************* */
 
-void no_PercursoInOrdem(struct No *x)
+void no_PercursoInOrdem(No *x)
 {
   if(x) {
     no_PercursoInOrdem(x->esq);
@@ -117,7 +126,7 @@ void no_PercursoInOrdem(struct No *x)
   printf("\n");
 }
 
-void no_PercursoPreOrdem(struct No *x)
+void no_PercursoPreOrdem(No *x)
 {
   if(x) {
     printf("(%d) ", x->chave);
@@ -129,7 +138,7 @@ void no_PercursoPreOrdem(struct No *x)
   printf("\n");
 }
 
-void no_PercursoPosOrdem(struct No *x)
+void no_PercursoPosOrdem(No *x)
 {
   if(x) {
     no_PercursoPosOrdem(x->esq);
@@ -151,15 +160,15 @@ void no_PercursoPosOrdem(struct No *x)
  * BEGIN: abb.c
  ********************************************* */
 
-void abb_Enumera(struct abb *T)
+void abb_Enumera(abb *T)
 {
   if(T->raiz)
     no_PercursoInOrdem(T->raiz);
 }
 
-struct TElem* abb_Busca(struct abb *T, TChave c)
+TElem* abb_Busca_(abb *T, TChave c)
 {
-  struct No *q = T->raiz;
+  No *q = T->raiz;
   while (q)
     if ((q->chave = c))
       return q->elem;
@@ -172,12 +181,12 @@ struct TElem* abb_Busca(struct abb *T, TChave c)
 }
 
 
-struct TElem* abb_BuscaPos(struct abb *T, TChave c, struct No **posins)
+TElem* abb_Busca(abb *T, TChave c, No **posins)
 {
-  struct No *q = T->raiz;
+  No *q = T->raiz;
   posins = &(T->raiz);
 
-  while (q)
+  while (q) {
     if ((q->chave == c))
       return q->elem;
     else if ( c < q->chave) {
@@ -187,18 +196,19 @@ struct TElem* abb_BuscaPos(struct abb *T, TChave c, struct No **posins)
       q = q->dir;
       posins = &(q->dir);
     }
+  }
 
   return NULL;
 }
 
-void abb_Insere(struct abb *T, TChave c, struct TElem *x)
+void abb_Insere(abb *T, TChave c, TElem *x)
 {
-  struct No **posins;
-  struct No *q;
-  struct TElem *v;
+  No **posins;
+  No *q;
+  TElem *v;
   
   posins = malloc(sizeof *posins);
-  v = abb_BuscaPos(T, c, posins);
+  v = abb_Busca(T, c, posins);
 
   if (!v) {
     q = malloc(sizeof *q);
@@ -214,14 +224,14 @@ void abb_Insere(struct abb *T, TChave c, struct TElem *x)
   free(posins);
 }
 
-struct TElem* abb_Remove(struct abb *T, TChave c)
+TElem* abb_Remove(abb *T, TChave c)
 {
-  struct No *q;
-  struct No **pontq;
-  struct TElem *x;
+  No *q;
+  No **pontq;
+  TElem *x;
 
   pontq = malloc(sizeof *pontq);
-  x = abb_BuscaPos(T, c, pontq);
+  x = abb_Busca(T, c, pontq);
 
   if (x) {
     q = *pontq;
@@ -231,8 +241,8 @@ struct TElem* abb_Remove(struct abb *T, TChave c)
         q->esq->dir = q->dir;
         *pontq = q->esq;
       } else {
-        struct No *qmenor = q->esq->dir;
-        struct No *paiqmenor = q->esq;
+        No *qmenor = q->esq->dir;
+        No *paiqmenor = q->esq;
         while(qmenor->dir) {
           qmenor = qmenor->dir;
           paiqmenor = qmenor;
@@ -261,12 +271,12 @@ struct TElem* abb_Remove(struct abb *T, TChave c)
 
 int main(void) {
 
-  struct abb *T;
+  abb *T;
   T = malloc(sizeof *T);
   T->raiz = NULL;
 
   
-  struct TElem *x = elem_Novo(10);
+  TElem *x = elem_Novo(10);
 
   TChave c = 1;
   abb_Insere(T, c, x);
