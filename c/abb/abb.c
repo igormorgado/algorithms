@@ -178,7 +178,7 @@ struct TElem* abb_BuscaPos(struct abb *T, TChave c, struct No **posins)
   posins = &(T->raiz);
 
   while (q)
-    if ((q->chave = c))
+    if ((q->chave == c))
       return q->elem;
     else if ( c < q->chave) {
       q = q->esq;
@@ -202,11 +202,11 @@ void abb_Insere(struct abb *T, TChave c, struct TElem *x)
 
   if (!v) {
     q = malloc(sizeof *q);
-    *posins  = q;
     q->chave = c;
     q->elem  = x;
     q->esq   = NULL;
     q->dir   = NULL;
+    *posins  = q;
   } else {
     printf("Chave existente %d\n", c);
   }
@@ -266,11 +266,11 @@ int main(void) {
   T->raiz = NULL;
 
   
-  TChave c = 1;
-  struct TElem *x = elem_Novo(1);
+  struct TElem *x = elem_Novo(10);
 
+  TChave c = 1;
   abb_Insere(T, c, x);
-  abb_Remove(T, 1);
+  abb_Remove(T, c);
 
   free(T);
 
