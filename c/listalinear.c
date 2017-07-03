@@ -54,8 +54,7 @@ TElem* ListaLinear_Busca_NaoOrdenada(ListaLinear *L, TChave c) {
   if ( p != NULL ) 
     return (p->Elem);
   else
-    // ("NULO")
-    return NULL;
+    return ELEMNULO;
 }
 
 // 04-47
@@ -72,8 +71,7 @@ TElem* ListaLinear_Busca_Ordenada(ListaLinear *L, TChave c, No *noAnt) {
   if ( p != NULL && p->Chave == c ) 
     return p->Elem;
   else
-    // ("NULO")
-    return NULL;
+    return ELEMNULO;
 
 }
 
@@ -138,8 +136,7 @@ void ListaLinear_Insere_Ordenada(ListaLinear *L, TChave c, TElem *x) {
 
   v = ListaLinear_Busca_Ordenada(L, c, noAnt);
 
-  // ("NULO")
-  if (v == NULL) {
+  if (E_ELEM_NULO(v)) {
     Novo = malloc(sizeof *Novo); 
     Novo->Chave = c;
     Novo->Elem = x;
@@ -164,8 +161,7 @@ TElem* ListaLinear_Remove(ListaLinear *L, TChave c) {
 
   x = ListaLinear_Busca_Ordenada(L, c, noAnt);
 
-  // ("NULO")
-  if (x != NULL) {
+  if (! E_ELEM_NULO(x)) {
     if ( noAnt == NULL ) {
       L->Inicio = L->Inicio->Prox;
       p = L->Inicio;
@@ -178,8 +174,7 @@ TElem* ListaLinear_Remove(ListaLinear *L, TChave c) {
     return (x);
   } else {
     printf("Chave inexistente");
-    /* ("NULO") */
-    return NULL;
+    return ELEMNULO;
   }
 }
 
@@ -200,8 +195,7 @@ TElem* ListaLinear_RemoveEm(ListaLinear *L, int Pos) {
     x = noAnt->Prox->Elem;
   }
 
-  // ("NULO")
-  if (x != NULL) {
+  if (! E_ELEM_NULO(x)) {
     if ( noAnt == NULL ) {
       L->Inicio = L->Inicio->Prox;
       p = L->Inicio;
@@ -214,8 +208,7 @@ TElem* ListaLinear_RemoveEm(ListaLinear *L, int Pos) {
     return (x);
   } else {
     printf("Chave inexistente");
-    /* ("NULO") */
-    return NULL;
+    return ELEMNULO;
   }
 }
 

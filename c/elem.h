@@ -14,4 +14,10 @@ struct TElem {
 
 struct TElem* elem_Novo(int val);
 
+struct TElem* elem_Nulo(void);
+
+#define E_ELEM_NULO(elem)       (((elem)->status == false)?true:false)
+
+#define ELEMNULO  elem_Nulo()
+
 #endif
